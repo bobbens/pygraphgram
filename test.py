@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 from ullman import ullman
-from graph import Graph, Node
+from graph import Graph
+from grammar import RuleGraph, Rule
 
 G = Graph()
 G.add_node( "G0", label="START" )
