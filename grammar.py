@@ -4,6 +4,8 @@ from ullman import ullman
 from graph import Graph, Node
 import random
 
+nodecounter = 0
+
 class RuleGraph( Graph ):
     def __init__( self, nodes=[], edges=[] ):
         super().__init__()
@@ -16,14 +18,16 @@ class RuleGraph( Graph ):
             self.add_edge( nodelist[e[0]], nodelist[e[1]] )
 
 class Rule():
-    def __init__( self, lhs, rhs, weight=1, limit=None ):
+    def __init__( self, lhs, rhs, name="unknown", weight=1, limit=None ):
         self.lhs = lhs
         self.rhs = rhs
         self.weight = weight
-        self.limit = None
+        self.limit = limit
         self.applied = 0
+        self.name = name
 
     def apply( self, G, num=1 ):
+        global nodecounter
         matches = ullman( G, self.lhs )
         random.shuffle(matches)
         for step in range(min(num,len(matches))):
@@ -40,7 +44,8 @@ class Rule():
             # Add new nodes
             nodes = []
             for n in self.rhs.nodes:
-                name = f"node{len(G.nodes)}"
+                name = f"node{nodecounter}"
+                nodecounter+=1
                 newn = Node( name, label=n.label )
                 G.add_node( newn )
                 nodes.append( newn )

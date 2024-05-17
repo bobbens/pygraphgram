@@ -25,7 +25,9 @@ class Graph():
         self.neighbours = []
 
     def add_node( self, n, label=None ):
-        self.nodes += [Node( n, label=label )]
+        newn = Node( n, label=label )
+        assert( not newn in self.nodes )
+        self.nodes += [newn]
         self.neighbours += [[]]
 
     def add_edge( self, a, b ):

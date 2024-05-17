@@ -29,10 +29,20 @@ S.add_edge( "S0", "S1" )
 
 print( ullman( G, S ) )
 
+G = Graph()
+G.add_node( "start", label="START" )
+G.add_node( "internal", label="X" )
+G.add_node( "goal", label="GOAL" )
+G.add_edge( "start", "internal" )
+G.add_edge( "internal", "goal" )
 
 R = RuleSet( [
-    Rule( RuleGraph( nodes = ["x"] ),
-          RuleGraph( nodes = ["x", "x"], edges = [(0,1)] ) )
+    Rule( RuleGraph( nodes=["X"] ),
+          RuleGraph( nodes=["X", "X"], edges=[(0,1)] ), name="expand", ),
+    Rule( RuleGraph( nodes=["X"] ),
+          RuleGraph( nodes=["SPLIT", "X", "X", "MERGE"], edges=[(0,1), (0,2), (1,3), (2,3)] ), name="split" ),
+    Rule( RuleGraph( nodes=["X"] ),
+          RuleGraph( nodes=["KEY", "X", "DOOR"], edges=[(0,1), (1,2)] ), limit=3, name="keydoor" ),
     ] )
 R.apply( G, 10 )
 dot = G.dot()
