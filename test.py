@@ -40,9 +40,11 @@ R = RuleSet( [
     Rule( RuleGraph( nodes=["X"] ),
           RuleGraph( nodes=["X", "X"], edges=[(0,1)] ), name="expand", ),
     Rule( RuleGraph( nodes=["X"] ),
-          RuleGraph( nodes=["SPLIT", "X", "X", "MERGE"], edges=[(0,1), (0,2), (1,3), (2,3)] ), name="split" ),
+          RuleGraph( nodes=["SPLIT", "X", "X"], edges=[(0,1), (0,2)] ), name="split" ),
     Rule( RuleGraph( nodes=["X"] ),
-          RuleGraph( nodes=["KEY", "X", "DOOR"], edges=[(0,1), (1,2)] ), limit=3, name="keydoor" ),
+          RuleGraph( nodes=["SPLIT", "X", "X", "MERGE"], edges=[(0,1), (0,2), (1,3), (2,3)] ), name="splitmerge" ),
+    Rule( RuleGraph( nodes=["X"] ),
+          RuleGraph( nodes=["KEY", "X", "DOOR"], edges=[(0,1), (1,2)] ), limit=1, name="keydoor" ),
     ] )
 R.apply( G, 10 )
 dot = G.dot()

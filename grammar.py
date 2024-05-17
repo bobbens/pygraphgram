@@ -48,15 +48,19 @@ class Rule():
                 nodecounter+=1
                 newn = Node( name, label=n.label )
                 G.add_node( newn )
+                #print(f"add_node {newn}")
                 nodes.append( newn )
             # Add new edges
             for e in self.rhs.edges:
                 G.add_edge( nodes[e[0]], nodes[e[1]] )
+                #print(f"add_edge {nodes[e[0]]}-{nodes[e[1]]}")
             # Reconnect to the rest
             for p in parents:
                 G.add_edge( p, nodes[0] )
+                #print(f"add_edge(parent) {p}-{nodes[0]}")
             for c in children:
                 G.add_edge( nodes[-1], c )
+                #print(f"add_edge(child) {nodes[-1]}-{c}")
         self.applied += 1
         G.rebuild()
 
