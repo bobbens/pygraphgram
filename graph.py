@@ -16,19 +16,17 @@ class Node():
             return self.name==other.name
         return False
     def __str__( self ):
-        return self.name
+        return f"Node({self.name}, {self.label})"
 
 class Graph():
     def __init__( self ):
         self.nodes = []
         self.edges = []
         self.neighbours = []
-        self.n_vertices = 0
 
     def add_node( self, n, label=None ):
         self.nodes += [Node( n, label=label )]
         self.neighbours += [[]]
-        self.n_vertices = len(self.nodes)
 
     def add_edge( self, a, b ):
         ia = self.nodes.index( Node(a) )
@@ -75,16 +73,28 @@ class Graph():
         return adj
 
     def rebuild( self ):
-        G = Graph()
-        for n in self.nodes:
+        nodes = self.nodes
+        edges = self.edges
+        self.__init__()
+        for n in nodes:
             if n is None:
                 continue
-            G.add_node( n )
-        for e in self.edges:
-            G.add_edge( self.nodes[e[0]], self.nodes[e[1]] )
-        return G
+            self.add_node( n )
+        for e in edges:
+            self.add_edge( nodes[e[0]], nodes[e[1]] )
 
     def __str__( self ):
         s = "nodes=["+", ".join([str(None if n is None else n.label) for n in self.nodes])+"]\n"
         s += "edges=["+", ".join([f"({e[0]}, {e[1]})" for e in self.edges])+"]"
         return s
+
+    def dot( self ):
+        import graphviz
+        G = graphviz.Digraph()
+        for n in self.nodes:
+            if n is None:
+                continue
+            G.node( n.name, n.label )
+        for e in self.edges:
+            G.edge( self.nodes[e[0]].name, self.nodes[e[1]].name )
+        return G

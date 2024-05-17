@@ -16,9 +16,12 @@ class RuleGraph( Graph ):
             self.add_edge( nodelist[e[0]], nodelist[e[1]] )
 
 class Rule():
-    def __init__( self, lhs, rhs ):
+    def __init__( self, lhs, rhs, weight=1, limit=None ):
         self.lhs = lhs
         self.rhs = rhs
+        self.weight = weight
+        self.limit = None
+        self.applied = 0
 
     def apply( self, G, num=1 ):
         matches = ullman( G, self.lhs )
@@ -49,4 +52,42 @@ class Rule():
                 G.add_edge( p, nodes[0] )
             for c in children:
                 G.add_edge( nodes[-1], c )
-        return G.rebuild()
+        self.applied += 1
+        G.rebuild()
+
+    def reset( self ):
+        self.applied = 0
+
+    def can_apply( self, G ):
+        return (self.limit==None or self.applied < self.limit) and len(ullman( G, self.lhs ))>0
+
+class RuleSet():
+    def __init__( self, rules=[] ):
+        self.rules = rules
+
+    def apply( self, G, num=1 ):
+        for step in range(num):
+            # Get potential applicable rules
+            wmax = 0
+            valid_rules = []
+            for i,r in enumerate(self.rules):
+                if r.can_apply(G):
+                    valid_rules.append( r )
+                    wmax += r.weight
+            if len(valid_rules)<=0:
+                break
+            # Now sort by weight and apply
+            rng = random.random() * wmax
+            w = 0
+            for r in valid_rules:
+                w += r.weight
+                if rng <= w:
+                    r.apply( G )
+                    break
+
+class Grammar():
+    def __init__( self ):
+        self.ruleset = []
+
+    def add_rule( self, r,  ):
+        self.ruleset += r

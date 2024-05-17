@@ -13,7 +13,7 @@ def search( G, S, assignments, candidates, found ):
             if not G.has_edge( assignments[edge[0]], assignments[edge[1]] ):
                 return False
     # All vertices assigned
-    if n==S.n_vertices:
+    if n==len(S.nodes):
         return True
     # Time to try candidates for next node
     for j in candidates[n]:

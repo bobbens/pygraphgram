@@ -2,7 +2,7 @@
 
 from ullman import ullman
 from graph import Graph
-from grammar import RuleGraph, Rule
+from grammar import RuleGraph, Rule, RuleSet
 
 G = Graph()
 G.add_node( "G0", label="START" )
@@ -29,7 +29,12 @@ S.add_edge( "S0", "S1" )
 
 print( ullman( G, S ) )
 
-LHS = RuleGraph( nodes = ["x"] )
-RHS = RuleGraph( nodes = ["x","x"], edges = [(0,1)] )
-R = Rule( LHS, RHS )
-print( R.apply( G ) )
+
+R = RuleSet( [
+    Rule( RuleGraph( nodes = ["x"] ),
+          RuleGraph( nodes = ["x", "x"], edges = [(0,1)] ) )
+    ] )
+R.apply( G, 10 )
+dot = G.dot()
+print( dot )
+dot.render()
