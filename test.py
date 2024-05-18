@@ -44,7 +44,7 @@ R = RuleSet( [
     Rule( RuleGraph( nodes=["X"] ),
           RuleGraph( nodes=["SPLIT", "X", "X", "MERGE"], edges=[(0,1), (0,2), (1,3), (2,3)] ), name="splitmerge" ),
     Rule( RuleGraph( nodes=["X"] ),
-          RuleGraph( nodes=["KEY", "X", "DOOR"], edges=[(0,1), (1,2)] ), limit=1, name="keydoor" ),
+          RuleGraph( nodes=["KEY", "X", "DOOR"], edges=[(0,1), (1,2),(0,2,"opens")] ), limit=1, name="keydoor" ),
     ] )
 R.apply( G, 10 )
 dot = G.dot()

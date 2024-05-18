@@ -15,7 +15,10 @@ class RuleGraph( Graph ):
         for n in nodelist:
             self.add_node( n )
         for e in edges:
-            self.add_edge( nodelist[e[0]], nodelist[e[1]] )
+            label = None
+            if len(e)>2:
+                label = e[2]
+            self.add_edge( nodelist[e[0]], nodelist[e[1]], label )
 
 class Rule():
     def __init__( self, lhs, rhs, name="unknown", weight=1, limit=None ):
@@ -34,7 +37,9 @@ class Rule():
             m = matches[step]
             # Store parents and children
             parents = [G.nodes[i] for i in G.parents( G.nodes[m[0]] ) ]
+            plabels = [G.get_edge_label( p, G.nodes[m[0]] ) for p in parents ]
             children = [G.nodes[i] for i in G.children( G.nodes[m[-1]] ) ]
+            clabels = [G.get_edge_label( G.nodes[m[-1]], c ) for c in children ]
             # Remove matched nodes
             nodes = []
             for i in m:
@@ -52,14 +57,14 @@ class Rule():
                 nodes.append( newn )
             # Add new edges
             for e in self.rhs.edges:
-                G.add_edge( nodes[e[0]], nodes[e[1]] )
+                G.add_edge( nodes[e[0]], nodes[e[1]], e[2] )
                 #print(f"add_edge {nodes[e[0]]}-{nodes[e[1]]}")
             # Reconnect to the rest
-            for p in parents:
-                G.add_edge( p, nodes[0] )
+            for i,p in enumerate(parents):
+                G.add_edge( p, nodes[0], plabels[i] )
                 #print(f"add_edge(parent) {p}-{nodes[0]}")
-            for c in children:
-                G.add_edge( nodes[-1], c )
+            for i,c in enumerate(children):
+                G.add_edge( nodes[-1], c, clabels[i] )
                 #print(f"add_edge(child) {nodes[-1]}-{c}")
         self.applied += 1
         G.rebuild()
@@ -93,10 +98,3 @@ class RuleSet():
                 if rng <= w:
                     r.apply( G )
                     break
-
-class Grammar():
-    def __init__( self ):
-        self.ruleset = []
-
-    def add_rule( self, r,  ):
-        self.ruleset += r

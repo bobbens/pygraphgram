@@ -10,7 +10,7 @@ def search( G, S, assignments, candidates, found ):
     # Make sure edges match for assigned vertices and subgraph
     for edge in S.edges:
         if edge[0]<n and edge[1]<n:
-            if not G.has_edge( assignments[edge[0]], assignments[edge[1]] ):
+            if not G.has_edge( assignments[edge[0]], assignments[edge[1]], edge[2] ):
                 return False
     # All vertices assigned
     if n==len(S.nodes):

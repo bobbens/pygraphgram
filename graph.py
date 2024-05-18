@@ -30,10 +30,10 @@ class Graph():
         self.nodes += [newn]
         self.neighbours += [[]]
 
-    def add_edge( self, a, b ):
+    def add_edge( self, a, b, label=None ):
         ia = self.nodes.index( Node(a) )
         ib = self.nodes.index( Node(b) )
-        self.edges += [(ia,ib)]
+        self.edges += [(ia,ib,label)]
         self.neighbours[ia] += [ib]
         #self.neighbours[ib] += [ia] # Directed graph
 
@@ -45,10 +45,21 @@ class Graph():
         for nl in self.neighbours:
             if ni in nl:
                 nl.remove(ni)
-        self.edges = [e for e in self.edges if not ni in e]
+        self.edges = [e for e in self.edges if not ni in e[0:2]]
 
-    def has_edge( self, a, b ):
-        return (b in self.neighbours[a])
+    def has_edge( self, a, b, label=None ):
+        #return (b in self.neighbours[a])
+        for e in self.edges:
+            if e[0]==a and e[1]==b and e[2]==label:
+                return True
+        return False
+
+    def get_edge_label( self, a, b ):
+        #return (b in self.neighbours[a])
+        for e in self.edges:
+            if e[0]==a and e[1]==b:
+                return e[2]
+        return None
 
     def adjacencies( self, n ):
         ni = self.nodes.index( Node(n) )
@@ -83,7 +94,7 @@ class Graph():
                 continue
             self.add_node( n )
         for e in edges:
-            self.add_edge( nodes[e[0]], nodes[e[1]] )
+            self.add_edge( nodes[e[0]], nodes[e[1]], e[2] )
 
     def __str__( self ):
         s = "nodes=["+", ".join([str(None if n is None else n.label) for n in self.nodes])+"]\n"
@@ -98,5 +109,5 @@ class Graph():
                 continue
             G.node( n.name, n.label )
         for e in self.edges:
-            G.edge( self.nodes[e[0]].name, self.nodes[e[1]].name )
+            G.edge( self.nodes[e[0]].name, self.nodes[e[1]].name, label=e[2] )
         return G
