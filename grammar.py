@@ -7,6 +7,9 @@ import random
 nodecounter = 0
 
 class RuleGraph( Graph ):
+    """
+    Just there to simplify API, and allow defining Graphs as sets of nodes and edges.
+    """
     def __init__( self, nodes=[], edges=[] ):
         super().__init__()
         nodelist = []
@@ -22,6 +25,26 @@ class RuleGraph( Graph ):
 
 class Rule():
     def __init__( self, lhs, rhs, embedin=[(0,0)], embedout=[(-1,-1)], name="unknown", weight=1, limit=None ):
+        """
+        Initializes a rule.
+
+        Parameters
+        ----------
+        lhs: Graph
+            The left hand side or mother graph to be matched and replaced.
+        rhs: Graph
+            The right hand side or daughter graph to replace the mother graph.
+        embedin: Array of pairs of indices, defaults to [(0,0)]
+            Determines how to map the incoming edges on the graph. The pair determines the index of the Node on the lhs Graph that should be matched to the index of the rhs Graph.
+        embedout: Array of pairs of indices, defaults to [(-1,-1)]
+            Determines how to map the outgoing edges on the graph. The pair determines the index of the Node on the lhs Graph that should be matched to the index of the rhs Graph.
+        name: str, defaults to "unknown"
+            Name to give the rule. Used for debugging info.
+        weight: number, defaults to 1
+            Weight to give the rule relative to other rules.
+        limit: integer, defaults to None
+            How many times the Rule can be applied in a singel stage.
+        """
         self.lhs = lhs
         self.rhs = rhs
         self.embedin = embedin
@@ -32,6 +55,16 @@ class Rule():
         self.name = name
 
     def apply( self, G, num=1 ):
+        """
+        Applies a Rule to a Graph G num times. Will be applied to a random match.
+
+        Parameters
+        ----------
+        G: Graph
+            Graph to apply the Rule to.
+        num: integer, defaults to 1
+            Number of times the Rule should be applied.
+        """
         global nodecounter
         matches = ullman( G, self.lhs )
         random.shuffle(matches)
@@ -84,9 +117,15 @@ class Rule():
         G.rebuild()
 
     def reset( self ):
+        """
+        Resets the internal state of the Rule.
+        """
         self.applied = 0
 
     def can_apply( self, G ):
+        """
+        Checks to see if the Rule can be applied to a graph G.
+        """
         return (self.limit==None or self.applied < self.limit) and len(ullman( G, self.lhs ))>0
 
 class RuleSet():
