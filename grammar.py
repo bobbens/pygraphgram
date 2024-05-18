@@ -21,9 +21,11 @@ class RuleGraph( Graph ):
             self.add_edge( nodelist[e[0]], nodelist[e[1]], label )
 
 class Rule():
-    def __init__( self, lhs, rhs, name="unknown", weight=1, limit=None ):
+    def __init__( self, lhs, rhs, embedin=[(0,0)], embedout=[(-1,-1)], name="unknown", weight=1, limit=None ):
         self.lhs = lhs
         self.rhs = rhs
+        self.embedin = embedin
+        self.embedout = embedout
         self.weight = weight
         self.limit = limit
         self.applied = 0
@@ -36,10 +38,16 @@ class Rule():
         for step in range(min(num,len(matches))):
             m = matches[step]
             # Store parents and children
-            parents = [G.nodes[i] for i in G.parents( G.nodes[m[0]] ) ]
-            plabels = [G.get_edge_label( p, G.nodes[m[0]] ) for p in parents ]
-            children = [G.nodes[i] for i in G.children( G.nodes[m[-1]] ) ]
-            clabels = [G.get_edge_label( G.nodes[m[-1]], c ) for c in children ]
+            embedin = []
+            for e in self.embedin:
+                parents = [G.nodes[i] for i in G.parents( G.nodes[m[e[0]]] ) ]
+                plabels = [G.get_edge_label( p, G.nodes[m[e[0]]] ) for p in parents ]
+                embedin += [(parents,plabels)]
+            embedout = []
+            for e in self.embedout:
+                children = [G.nodes[i] for i in G.children( G.nodes[m[e[0]]] ) ]
+                clabels = [G.get_edge_label( G.nodes[m[e[0]]], c ) for c in children ]
+                embedout += [(children,clabels)]
             # Remove matched nodes
             nodes = []
             for i in m:
@@ -60,12 +68,18 @@ class Rule():
                 G.add_edge( nodes[e[0]], nodes[e[1]], e[2] )
                 #print(f"add_edge {nodes[e[0]]}-{nodes[e[1]]}")
             # Reconnect to the rest
-            for i,p in enumerate(parents):
-                G.add_edge( p, nodes[0], plabels[i] )
-                #print(f"add_edge(parent) {p}-{nodes[0]}")
-            for i,c in enumerate(children):
-                G.add_edge( nodes[-1], c, clabels[i] )
-                #print(f"add_edge(child) {nodes[-1]}-{c}")
+            for i in range(len(self.embedin)):
+                e = self.embedin[i]
+                ei = embedin[i]
+                for j,p in enumerate(ei[0]):
+                    G.add_edge( p, nodes[e[1]], ei[1][j] )
+                    #print(f"add_edge(parent) {p}-{nodes[e[1]]}")
+            for i in range(len(self.embedout)):
+                e = self.embedout[i]
+                eo = embedout[i]
+                for j,c in enumerate(eo[0]):
+                    G.add_edge( nodes[e[1]], c, eo[1][i] )
+                    #print(f"add_edge(child) {nodes[e[1]]}-{c}")
         self.applied += 1
         G.rebuild()
 
